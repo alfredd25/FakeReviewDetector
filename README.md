@@ -9,6 +9,7 @@ A Chrome extension that uses Machine Learning to detect and highlight potentiall
 - Highlights potentially fake reviews with color indicators:
   - **Red**: High confidence (90%+) that the review is fake
   - **Orange**: Uncertain but suspicious reviews
+  - **Green**: Verified as genuine with high confidence.
 - Provides a popup interface to manually check specific reviews
 
 ## Architecture

@@ -77,7 +77,7 @@ def extract_features(df):
 
 
 def prepare_dataset():
-    df = load_hotel_reviews('../datasets/Hotel_reviews')
+    df = load_hotel_reviews('../datasets/Hotel_Reviews')
 
     df = extract_features(df)
 

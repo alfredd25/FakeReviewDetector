@@ -27,7 +27,7 @@ This project consists of two main components:
 
 - **Machine Learning**: Python, scikit-learn, NLTK, Flask
 - **Extension**: JavaScript, HTML, CSS
-- **Data**: Public review datasets from Yelp, Amazon, and TripAdvisor
+- **Data**: Public review labeled datasets from TripAdvisor
 
 ## Getting Started
 

@@ -1,1 +1,37 @@
- 
+{
+  "manifest_version": 3,
+  "name": "Fake Review Detector",
+  "version": "1.0",
+  "description": "Highlights potentially fake reviews using AI.",
+  "permissions": ["scripting", "activeTab", "storage"],
+  "host_permissions": [
+    "http://127.0.0.1:5000/*",
+    "https://www.amazon.com/*",
+    "https://www.yelp.com/*",
+    "https://www.tripadvisor.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.tripadvisor.com/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

@@ -32,17 +32,25 @@ def prepare_features(text):
     X_meta = csr_matrix([meta_features])
     return hstack([X_text, X_meta])
 
-@app.route("/predict", methods=["POST"])
+@app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
-    if not data or "review" not in data:
-        return jsonify({"error": "No review provided"}), 400
-    review_text = data["review"]
-    X = prepare_features(review_text)
-    pred = classifier.predict(X)[0]
-    proba = classifier.predict_proba(X)[0]
-    confidence = max(proba)
-    return jsonify({"label": pred, "confidence": confidence})
+    if not data or 'review' not in data:
+        return jsonify({'error': 'No review provided'}), 400
+
+    review_text = data['review'].strip()
+    if not review_text:
+        return jsonify({'error': 'Empty review text'}), 400
+
+    try:
+        X = prepare_features(review_text)
+        pred = classifier.predict(X)[0]
+        proba = classifier.predict_proba(X)[0]
+        confidence = max(proba)
+        return jsonify({'label': pred, 'confidence': confidence})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route("/predict-batch", methods=["POST"])
 def predict_batch():

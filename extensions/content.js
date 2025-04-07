@@ -1,5 +1,9 @@
 function analyzeAndHighlight(reviewElement) {
-  const reviewText = reviewElement.innerText;
+  const reviewText = reviewElement.innerText.trim();
+  if (!reviewText || reviewElement.dataset.analyzed) return;
+
+  reviewElement.dataset.analyzed = "true";
+
   chrome.runtime.sendMessage(
     { type: "analyzeReview", review: reviewText },
     response => {
@@ -18,12 +22,7 @@ function analyzeAndHighlight(reviewElement) {
 
 function scanAndHighlightReviews() {
   const reviews = document.querySelectorAll('div._T.FKffI.bmUTE');
-  reviews.forEach(review => {
-    if (!review.dataset.analyzed) {
-      analyzeAndHighlight(review);
-      review.dataset.analyzed = "true";
-    }
-  });
+  reviews.forEach(review => analyzeAndHighlight(review));
 }
 
 const observer = new MutationObserver(() => {

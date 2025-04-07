@@ -1,6 +1,13 @@
-document.getElementById("analyzeBtn").addEventListener("click", () => {
-  const review = document.getElementById("reviewInput").value;
-  if (!review.trim()) return;
+const input = document.getElementById("reviewInput");
+const button = document.getElementById("analyzeBtn");
+const resultBox = document.getElementById("result");
+
+button.addEventListener("click", () => {
+  const review = input.value.trim();
+  if (!review) return;
+
+  resultBox.innerText = "Analyzing...";
+  resultBox.style.color = "#333";
 
   fetch("http://127.0.0.1:5000/predict", {
     method: "POST",
@@ -11,15 +18,19 @@ document.getElementById("analyzeBtn").addEventListener("click", () => {
   })
     .then(response => response.json())
     .then(data => {
-      const result = document.getElementById("result");
       if (data.label && data.confidence !== undefined) {
-        result.innerText = `Prediction: ${data.label.toUpperCase()} (${(data.confidence * 100).toFixed(1)}%)`;
+        const labelText = data.label.toUpperCase();
+        const confidencePercent = (data.confidence * 100).toFixed(1);
+        const color = data.label === "fake" ? "red" : "green";
+        resultBox.innerText = `Prediction: ${labelText} (${confidencePercent}%)`;
+        resultBox.style.color = color;
       } else {
-        result.innerText = "Error: Unable to analyze the review.";
+        resultBox.innerText = "Unexpected response.";
+        resultBox.style.color = "orange";
       }
     })
     .catch(() => {
-      document.getElementById("result").innerText = "API Error. Make sure the server is running.";
+      resultBox.innerText = "API error. Make sure the server is running.";
+      resultBox.style.color = "red";
     });
 });
-

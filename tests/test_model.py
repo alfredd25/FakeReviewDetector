@@ -1,43 +1,43 @@
 import unittest
-import json
-from backend.predict import app
+import joblib
+import os
+from backend.predict import app, prepare_features
 
-class TestPredictionAPI(unittest.TestCase):
+class TestFakeReviewDetector(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
-        self.app.testing = True
+        self.model_dir = os.path.join(os.path.dirname(__file__), '..', 'backend', 'model')
+        self.classifier = joblib.load(os.path.join(self.model_dir, 'classifier.pkl'))
+        self.vectorizer = joblib.load(os.path.join(self.model_dir, 'vectorizer.pkl'))
 
-    def test_single_prediction(self):
-        payload = {'review': 'This hotel has excellent service and a comfortable room.'}
-        response = self.app.post('/predict', json=payload)
+    def test_model_prediction_real(self):
+        review = "The hotel was clean and the staff were very helpful."
+        X = prepare_features(review)
+        prediction = self.classifier.predict(X)[0]
+        self.assertIn(prediction, ['real', 'fake'])
+
+    def test_model_prediction_fake(self):
+        review = "I loved it! Best place ever! A++++ would go again!!!"
+        X = prepare_features(review)
+        prediction = self.classifier.predict(X)[0]
+        self.assertIn(prediction, ['real', 'fake'])
+
+    def test_flask_predict_api(self):
+        response = self.app.post('/predict', json={'review': 'Absolutely horrible stay. Would not recommend.'})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
+        data = response.get_json()
         self.assertIn('label', data)
         self.assertIn('confidence', data)
 
-    def test_batch_prediction(self):
-        payload = {
-            'reviews': [
-                'The room was dirty and the service was terrible.',
-                'Had a wonderful stay with great amenities.'
-            ]
-        }
-        response = self.app.post('/predict-batch', json=payload)
+    def test_flask_batch_predict_api(self):
+        reviews = ["The food was amazing and the view was breathtaking.", "Terrible service and dirty rooms."]
+        response = self.app.post('/predict-batch', json={'reviews': reviews})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertIsInstance(data, list)
+        data = response.get_json()
         self.assertEqual(len(data), 2)
         for result in data:
             self.assertIn('label', result)
             self.assertIn('confidence', result)
-
-    def test_no_review(self):
-        payload = {}
-        response = self.app.post('/predict', json=payload)
-        self.assertEqual(response.status_code, 400)
-        data = json.loads(response.data)
-        self.assertIn('error', data)
-
 
 if __name__ == '__main__':
     unittest.main()

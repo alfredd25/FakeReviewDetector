@@ -4,3 +4,4 @@ nltk
 joblib
 pandas
 numpy
+flask-cors

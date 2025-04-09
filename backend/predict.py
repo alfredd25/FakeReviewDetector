@@ -3,8 +3,11 @@ import re
 from flask import Flask, request, jsonify
 import joblib
 from scipy.sparse import hstack, csr_matrix
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app)
 
 model_dir = os.path.join(os.path.dirname(__file__), "model")
 classifier = joblib.load(os.path.join(model_dir, "classifier.pkl"))

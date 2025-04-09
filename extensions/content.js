@@ -1,34 +1,55 @@
-function analyzeAndHighlight(reviewElement) {
-  const reviewText = reviewElement.innerText.trim();
-  if (!reviewText || reviewElement.dataset.analyzed) return;
+function getReviewElements() {
+  const host = window.location.hostname;
 
-  reviewElement.dataset.analyzed = "true";
+  if (host.includes("tripadvisor.com")) {
+    return document.querySelectorAll("div._T.FKffI.bmUTE");
+  }
+
+  if (host.includes("amazon.in")) {
+    return document.querySelectorAll("span[data-hook='review-body']");
+  }
+
+  return [];
+}
+
+function highlightReview(element, label, confidence) {
+  if (label === "fake") {
+    element.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
+  } else if (label === "real" && confidence >= 0.7) {
+    element.style.backgroundColor = "rgba(0, 255, 0, 0.2)";
+  } else if (label === "real" && confidence < 0.7) {
+    element.style.backgroundColor = "rgba(255, 255, 0, 0.2)";
+  }
+
+  element.style.borderRadius = "6px";
+  element.style.padding = "4px";
+}
+
+function analyzeReviewElement(element) {
+  const text = element.innerText.trim();
+  if (!text || element.dataset.analyzed) return;
+
+  element.dataset.analyzed = "true";
 
   chrome.runtime.sendMessage(
-    { type: "analyzeReview", review: reviewText },
+    { type: "analyzeReview", review: text },
     response => {
-      if (response && response.label) {
-        if (response.label === "fake") {
-          reviewElement.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
-        } else if (response.label === "real") {
-          reviewElement.style.backgroundColor = "rgba(0, 255, 0, 0.2)";
-        }
-        reviewElement.style.borderRadius = "6px";
-        reviewElement.style.padding = "4px";
+      if (response && response.label && response.confidence !== undefined) {
+        highlightReview(element, response.label, response.confidence);
       }
     }
   );
 }
 
-function scanAndHighlightReviews() {
-  const reviews = document.querySelectorAll('div._T.FKffI.bmUTE');
-  reviews.forEach(review => analyzeAndHighlight(review));
+function scanPage() {
+  const elements = getReviewElements();
+  elements.forEach(analyzeReviewElement);
 }
 
 const observer = new MutationObserver(() => {
-  scanAndHighlightReviews();
+  scanPage();
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
 
-scanAndHighlightReviews();
+scanPage();

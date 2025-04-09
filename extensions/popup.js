@@ -9,7 +9,7 @@ button.addEventListener("click", () => {
   resultBox.innerText = "Analyzing...";
   resultBox.style.color = "#333";
 
-  fetch("http://127.0.0.1:5000/predict", {
+  fetch("https://fake-review-api.onrender.com/predict", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"

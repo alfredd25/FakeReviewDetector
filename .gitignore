@@ -6,7 +6,6 @@ __pycache__/
 .Python
 venv/
 ENV/
-*.pkl
 
 # JavaScript
 node_modules/

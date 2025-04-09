@@ -1,6 +1,6 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === "analyzeReview") {
-    fetch("https://fake-review-api.onrender.compredict", {
+    fetch("https://fake-review-api.onrender.com/predict", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
